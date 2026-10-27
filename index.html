@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MPI Praktikum Golongan Darah ABO</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;background:#dbeafe;color:#0f172a;min-height:100vh}
+.scr{display:none}.scr.on{display:block;animation:in .45s ease}
+@keyframes in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.btn{background:#1d4ed8;color:#fff;font-weight:700;padding:.6rem 1.2rem;border-radius:.9rem;box-shadow:0 4px 0 #1e3a8a;transition:.15s;cursor:pointer}
+.btn:hover{background:#2563eb;transform:translateY(-2px)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.alt{background:#fff;color:#1e3a8a;box-shadow:0 4px 0 #93c5fd;border:2px solid #93c5fd}
+.btn.alt:hover{background:#eff6ff}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.nb{background:#1e40af;color:#fff;padding:.4rem .75rem;border-radius:.6rem;font-weight:700;font-size:.8rem;cursor:pointer}
+.nb:hover{background:#3b82f6}.nb.act{background:#fff;color:#1e3a8a}
+.card{background:#fff;border-radius:1rem;padding:1.1rem;box-shadow:0 4px 14px rgba(30,64,175,.15)}
+.cert{border:10px double #1d4ed8;background:#fff;padding:2rem;text-align:center}
+@media print{body *{visibility:hidden}#certbox,#certbox *{visibility:visible}#certbox{position:absolute;left:0;top:0;width:100%}}
+</style></head>
+<body>
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2 rounded-xl text-white font-bold hidden"></div>
+
+<!-- SPLASH -->
+<section id="splash" class="scr on">
+ <div class="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-blue-600 to-blue-900 text-white">
+  <div class="text-7xl mb-3" style="animation:pop .9s backwards">🩸</div>
+  <h1 class="text-4xl md:text-6xl font-extrabold" style="animation:pop 1s .2s backwards">Golongan Darah ABO</h1>
+  <p class="text-xl md:text-2xl mt-3" style="animation:pop 1s .5s backwards">Media Pembelajaran Interaktif · Biologi Kelas XI</p>
+  <p class="text-lg mt-1" style="animation:pop 1s .6s backwards">Praktikum Golongan Darah</p>
+  <button class="btn alt !text-2xl !px-12 !py-3 mt-8" style="animation:pop 1s .9s backwards" onclick="begin()">MULAI</button>
+  <p class="mt-10 text-sm">Pengembang: Rifti Agustina Ahdiati, S.Pd. · 2026</p>
+ </div>
+</section>
+
+<!-- HEADER -->
+<header id="hd" class="hidden fixed top-0 inset-x-0 z-40 bg-blue-900 p-2 flex items-center gap-2 shadow">
+ <button class="btn !py-1 !px-3 text-sm" style="box-shadow:0 3px 0 #172554" onclick="go('home')">🏠 HOME</button>
+ <nav id="nav" class="flex gap-1 flex-wrap ml-auto">
+  <button class="nb" data-n="home" onclick="go('home')">BERANDA</button>
+  <button class="nb" data-n="materi" onclick="go('materi');mat(mi)">MATERI</button>
+  <button class="nb" data-n="simulasi" onclick="go('simulasi')">SIMULASI</button>
+  <button class="nb" data-n="kuis" onclick="go('kuis')">KUIS</button>
+ </nav>
+</header>
+
+<main class="max-w-3xl mx-auto px-3 pt-20 pb-10">
+
+<!-- BERANDA -->
+<section id="home" class="scr">
+ <div class="card mb-4">
+  <h2 class="text-2xl font-extrabold text-blue-800 mb-1">Selamat datang! 👋</h2>
+  <p class="mb-3">Di media ini kamu akan belajar tentang <b>golongan darah ABO pada manusia</b>.</p>
+  <p class="font-bold text-blue-800">Tujuan pembelajaran</p>
+  <p class="mb-4">Siswa dapat mengetahui golongan darah ABO pada manusia.</p>
+  <label for="nama" class="font-bold block mb-1">Nama siswa</label>
+  <input id="nama" type="text" maxlength="40" autocomplete="off" placeholder="Ketik namamu di sini..." class="w-full border-2 border-blue-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-blue-700">
+  <p class="text-sm text-slate-600 mt-1">Namamu akan tampil di sertifikat.</p>
+  <div class="grid grid-cols-3 gap-2 mt-4">
+   <button class="btn" onclick="go('materi');mat(0)">📖 MATERI</button>
+   <button class="btn" onclick="go('simulasi')">🧪 SIMULASI</button>
+   <button class="btn" onclick="go('kuis')">🎮 KUIS</button>
+  </div>
+ </div>
+ <div class="card mb-4">
+  <h3 class="font-extrabold text-blue-800 mb-2">⚙️ Pengaturan</h3>
+  <div class="flex items-center gap-3 mb-3"><span class="font-bold">Musik latar</span><button id="mbtn" class="btn !py-1" onclick="tm()">ON</button></div>
+  <label for="vol" class="font-bold block">Volume: <span id="vv">50</span>%</label>
+  <input id="vol" type="range" min="0" max="100" value="50" class="w-full accent-blue-700">
+ </div>
+ <p class="text-center text-sm text-slate-700">Pengembang: Rifti Agustina Ahdiati, S.Pd. · 2026</p>
+</section>
+
+<!-- MATERI -->
+<section id="materi" class="scr">
+ <h2 class="text-2xl font-extrabold text-blue-800 mb-3">📖 Materi Golongan Darah ABO</h2>
+ <div id="mtabs" class="flex gap-2 flex-wrap mb-3"></div>
+ <div id="mbody" class="card leading-relaxed"></div>
+ <div class="flex justify-between mt-3">
+  <button id="mprev" class="btn" onclick="mat(mi-1)">◀ Sebelumnya</button>
+  <button id="mnext" class="btn" onclick="mat(mi+1)">Berikutnya ▶</button>
+ </div>
+</section>
+
+<!-- SIMULASI -->
+<section id="simulasi" class="scr">
+ <h2 class="text-2xl font-extrabold text-blue-800 mb-3">🧪 Simulasi: Uji Pemahaman</h2>
+ <div id="sintro" class="card text-center">
+  <p class="mb-2">10 soal: <b>pilihan ganda</b>, <b>seret kata (drag the word)</b>, dan <b>tandai kata (mark the word)</b>.</p>
+  <p class="mb-4">Setiap soal bernilai 10. Nilaimu otomatis tersimpan dan sertifikat tampil setelah selesai.</p>
+  <button class="btn !text-xl" onclick="simStart()">MULAI SIMULASI</button>
+ </div>
+ <div id="sq" class="hidden"></div>
+</section>
+
+<!-- KUIS -->
+<section id="kuis" class="scr">
+ <h2 class="text-2xl font-extrabold text-blue-800 mb-3">🎮 Pilih Game Kuis</h2>
+ <p class="mb-3">Setiap game punya 3 level yang makin sulit. Lulus level untuk membuka level berikutnya.</p>
+ <div class="grid sm:grid-cols-2 gap-3" id="gmenu"></div>
+</section>
+<section id="game" class="scr">
+ <button class="btn alt mb-3 !py-1" onclick="go('kuis')">◀ Pilih game</button>
+ <div id="gbox"></div>
+</section>
+
+<!-- SERTIFIKAT -->
+<section id="cert" class="scr">
+ <div id="certbox" class="cert">
+  <p class="text-3xl">🏅</p>
+  <h2 class="text-3xl md:text-4xl font-extrabold text-blue-800">SERTIFIKAT PENCAPAIAN</h2>
+  <p class="mt-3">Diberikan kepada</p>
+  <p id="cn" class="text-3xl font-extrabold my-2 text-blue-900 break-words"></p>
+  <p>yang telah menyelesaikan simulasi <b>Praktikum Golongan Darah ABO</b><br>Biologi Kelas XI dengan nilai</p>
+  <p id="cs" class="text-6xl font-extrabold text-blue-700 my-2"></p>
+  <p id="cm" class="font-bold"></p>
+  <p id="cd" class="text-sm mt-3"></p>
+  <p class="text-sm mt-4">Pengembang media: Rifti Agustina Ahdiati, S.Pd. · 2026</p>
+ </div>
+ <div class="flex gap-2 flex-wrap justify-center mt-4">
+  <button class="btn" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+  <button class="btn alt" onclick="dl()">⬇️ Unduh data nilai (CSV)</button>
+  <button class="btn alt" onclick="go('home')">Kembali ke Beranda</button>
+ </div>
+</section>
+</main>
+
+<script>
+/* ===== KONFIGURASI NILAI → SHEET =====
+   Tempel URL endpoint (Web App / webhook) yang menulis ke lembar data Anda (mis. Canva Sheet via Zapier/Make/Apps Script).
+   Data dikirim JSON: {nama,nilai,benar,waktu}. Jika kosong, nilai hanya disimpan di browser + bisa diunduh CSV. */
+const SHEET_URL='';
+
+const $=i=>document.getElementById(i);
+let mi=0,tt;
+/* ===== AUDIO (disintesis, tanpa file eksternal) ===== */
+let AC,vol=.5,musicOn=true,mt,ms=0;
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}
+function tone(f,d,ty,g,w){try{const a=ac(),o=a.createOscillator(),e=a.createGain(),s=a.currentTime+(w||0);o.type=ty||'sine';o.frequency.value=f;e.gain.setValueAtTime((g||.2)*vol,s);e.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(e);e.connect(a.destination);o.start(s);o.stop(s+d)}catch(x){}}
+const sClick=()=>tone(700,.07,'square',.12),sOk=()=>{tone(523,.15,'triangle',.25);tone(784,.25,'triangle',.25,.12)},sBad=()=>tone(180,.3,'sawtooth',.18),sWin=()=>[523,659,784,1047].forEach((f,i)=>tone(f,.3,'triangle',.25,i*.14));
+const mel=[523,659,784,659,880,784,659,523,587,698,880,698,784,659,587,523];
+function startMusic(){clearInterval(mt);if(!musicOn)return;mt=setInterval(()=>{const n=mel[ms++%mel.length];tone(n,.28,'triangle',.1);if(ms%4==1)tone(n/2,.55,'sine',.09)},320)}
+function tm(){musicOn=!musicOn;$('mbtn').textContent=musicOn?'ON':'OFF';$('mbtn').classList.toggle('alt',!musicOn);musicOn?startMusic():clearInterval(mt)}
+$('vol').addEventListener('input',e=>{vol=e.target.value/100;$('vv').textContent=e.target.value});
+document.addEventListener('click',e=>{if(e.target.closest('button'))sClick()});
+
+/* ===== NAVIGASI ===== */
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');$('hd').classList.toggle('hidden',id==='splash');const m={game:'kuis',cert:'simulasi'}[id]||id;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('act',b.dataset.n===m));scrollTo(0,0)}
+function begin(){ac();startMusic();go('home')}
+function toast(m,ok){const t=$('toast');t.textContent=m;t.className='fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2 rounded-xl text-white font-bold '+(ok?'bg-green-600':'bg-red-600');clearTimeout(tt);tt=setTimeout(()=>t.classList.add('hidden'),1400)}
+const nm=()=>$('nama').value.trim();
+
+/* ===== MATERI ===== */
+const BT={A:['Antigen A','Anti-B','A dan AB','A dan O'],B:['Antigen B','Anti-A','B dan AB','B dan O'],AB:['Antigen A dan B','Tidak ada','AB saja','A, B, AB, dan O'],O:['Tidak ada','Anti-A dan Anti-B','A, B, AB, dan O','O saja']};
+let ra=false,rb=false;
+const MP=[
+['Apa itu golongan darah?',()=>`<p class="mb-2">Golongan darah adalah pengelompokan darah berdasarkan ada atau tidaknya <b>antigen</b> pada permukaan <b>eritrosit</b> (sel darah merah).</p><p class="mb-2">Sistem ABO ditemukan oleh <b>Karl Landsteiner</b> pada tahun 1901. Di dalam plasma darah terdapat <b>antibodi</b> yang melawan antigen yang tidak dimiliki tubuh.</p><p>Bila antigen bertemu antibodi yang sesuai, darah akan <b>menggumpal</b>. Peristiwa ini disebut <b>aglutinasi</b>.</p>`],
+['Empat golongan darah',()=>`<p class="mb-3">Klik salah satu golongan darah untuk melihat rinciannya.</p><div class="flex gap-2 mb-3">${Object.keys(BT).map(k=>`<button class="btn !text-xl flex-1" onclick="rv('${k}')">${k}</button>`).join('')}</div><div id="rvbox" class="bg-blue-50 rounded-xl p-3">Belum ada yang dipilih.</div>`],
+['Transfusi darah',()=>`<ul class="list-disc pl-5 space-y-2"><li>Darah donor tidak boleh mengandung antigen yang dilawan oleh antibodi penerima (resipien), sebab akan terjadi aglutinasi.</li><li>Golongan <b>O</b> tidak punya antigen A dan B sehingga disebut <b>donor universal</b>.</li><li>Golongan <b>AB</b> tidak punya antibodi anti-A dan anti-B sehingga disebut <b>resipien universal</b>.</li><li>Selain ABO, ada juga faktor <b>Rhesus</b> (Rh+ atau Rh−) yang ikut diperiksa sebelum transfusi.</li></ul>`],
+['Praktikum menentukan golongan darah',()=>`<p class="font-bold">Alat dan bahan</p><p class="mb-2">Kaca objek, lancet steril sekali pakai, kapas alkohol 70%, serum anti-A, serum anti-B, tusuk gigi, sarung tangan.</p><p class="font-bold">Langkah kerja</p><ol class="list-decimal pl-5 mb-2 space-y-1"><li>Bersihkan ujung jari dengan alkohol, lalu tusuk dengan lancet steril (di bawah pengawasan guru).</li><li>Teteskan darah pada dua tempat di kaca objek.</li><li>Tambahkan serum anti-A pada tetes pertama dan anti-B pada tetes kedua.</li><li>Aduk masing-masing dengan tusuk gigi yang berbeda.</li><li>Amati selama 1–2 menit: ada gumpalan atau tidak.</li></ol><p class="font-bold mb-1">Coba sendiri: pilih tetes yang menggumpal</p><div class="flex gap-2 mb-2"><button class="btn" onclick="ra=!ra;rs()">Anti-A menggumpal?</button><button class="btn" onclick="rb=!rb;rs()">Anti-B menggumpal?</button></div><div id="res" class="bg-blue-50 rounded-xl p-3"></div>`]
+];
+function mat(i){if(i<0||i>=MP.length)return;mi=i;$('mtabs').innerHTML=MP.map((p,k)=>`<button class="btn ${k==i?'':'alt'} text-sm" onclick="mat(${k})">${k+1}. ${p[0]}</button>`).join('');$('mbody').innerHTML=MP[i][1]();$('mprev').disabled=i==0;$('mnext').disabled=i==MP.length-1;if(i==3)rs()}
+function rv(k){const b=BT[k];$('rvbox').innerHTML=`<p class="text-xl font-extrabold text-blue-800 mb-1">Golongan darah ${k}</p><p>🔹 Antigen pada eritrosit: <b>${b[0]}</b></p><p>🔹 Antibodi pada plasma: <b>${b[1]}</b></p><p>🔹 Dapat mendonorkan ke: <b>${b[2]}</b></p><p>🔹 Dapat menerima dari: <b>${b[3]}</b></p>`}
+function rs(){const t=ra&&rb?'AB':ra?'A':rb?'B':'O',d=(x,l)=>`<span class="inline-block mr-4"><span class="inline-block w-5 h-5 rounded-full align-middle mr-1 ${x?'bg-red-800':'bg-red-300'}"></span>${l}: <b>${x?'menggumpal':'tidak menggumpal'}</b></span>`;$('res').innerHTML=d(ra,'Anti-A')+d(rb,'Anti-B')+`<p class="mt-2 text-lg">Golongan darah sampel: <b class="text-blue-800 text-2xl">${t}</b></p>`}
+
+/* ===== SIMULASI 10 SOAL ===== */
+const SQ=[
+{t:'mc',i:'Sistem golongan darah ABO ditemukan oleh...',o:['Karl Landsteiner','Louis Pasteur','Gregor Mendel','Robert Hooke'],a:0},
+{t:'mc',i:'Antigen pada permukaan eritrosit golongan darah A adalah...',o:['Antigen B','Antigen A','Antigen A dan B','Tidak ada antigen'],a:1},
+{t:'drag',i:'Seret kata ke tempat yang tepat (atau ketuk kata, lalu ketuk kotaknya).',s:'Golongan darah A memiliki antigen ___ pada eritrosit dan antibodi ___ pada plasma.',b:['A','anti-B'],w:['A','B','anti-A','anti-B']},
+{t:'mc',i:'Jika serum anti-A dan anti-B sama-sama menyebabkan penggumpalan, golongan darah sampel adalah...',o:['A','B','AB','O'],a:2},
+{t:'mark',i:'Tandai satu kata yang menyatakan peristiwa menggumpalnya darah.',s:'Pada praktikum, darah yang bereaksi dengan serum yang cocok akan mengalami aglutinasi di kaca objek.',a:'aglutinasi'},
+{t:'mc',i:'Golongan darah yang menjadi donor universal adalah...',o:['AB','O','A','B'],a:1},
+{t:'drag',i:'Seret kata ke tempat yang tepat.',s:'Golongan darah ___ disebut donor universal, sedangkan golongan ___ disebut resipien universal.',b:['O','AB'],w:['O','AB','A','B']},
+{t:'mc',i:'Penggumpalan darah akibat reaksi antigen dan antibodi disebut...',o:['Fagositosis','Aglutinasi','Difusi','Osmosis'],a:1},
+{t:'mark',i:'Tandai golongan darah yang tidak memiliki antigen A maupun B.',s:'Golongan darah A, B, AB, dan O',a:'O'},
+{t:'drag',i:'Seret kata ke tempat yang tepat.',s:'Antigen terdapat pada ___, sedangkan antibodi terdapat pada ___.',b:['eritrosit','plasma'],w:['eritrosit','plasma','trombosit','leukosit']}
+];
+let si=0,ss=0,sel=null,pk=null,dg=null,fl=[];
+const cl=w=>w.replace(/[.,]/g,'');
+function simStart(){if(!nm()){alert('Isi nama siswa dulu di BERANDA ya.');go('home');$('nama').focus();return}si=0;ss=0;$('sintro').classList.add('hidden');$('sq').classList.remove('hidden');qReset();rS()}
+function qReset(){sel=pk=dg=null;const q=SQ[si];fl=q.b?q.b.map(()=>null):[]}
+function rS(){const q=SQ[si];let h=`<div class="flex justify-between font-bold mb-2"><span>Soal ${si+1} dari 10</span><span>Skor: ${ss*10}</span></div><div class="card"><p class="text-xs font-bold text-blue-700 mb-1">${{mc:'PILIHAN GANDA',drag:'DRAG THE WORD',mark:'MARK THE WORD'}[q.t]}</p><p class="font-semibold mb-3">${q.i}</p>`;
+if(q.t=='mc')h+=q.o.map((o,k)=>`<button class="btn ${sel===k?'':'alt'} block w-full mb-2 text-left" onclick="sel=${k};rS()">${o}</button>`).join('');
+if(q.t=='mark')h+='<p class="leading-10">'+q.s.split(' ').map((w,k)=>`<button class="btn ${sel===k?'':'alt'} !py-0 !px-2 m-1" onclick="sel=${k};rS()">${w}</button>`).join('')+'</p>';
+if(q.t=='drag'){h+='<p class="text-lg" style="line-height:3rem">'+q.s.split('___').map((p,k)=>p+(k<q.b.length?`<span ondragover="event.preventDefault()" ondrop="plc(${k},dg)" onclick="sl(${k})" class="inline-block min-w-[6.5rem] border-b-4 border-blue-700 bg-blue-50 text-center font-bold px-2 mx-1 rounded cursor-pointer">${fl[k]||'&nbsp;'}</span>`:'')).join('')+'</p><div class="flex gap-2 flex-wrap mt-3">'+q.w.map((w,k)=>fl.includes(w)?'':`<button draggable="true" ondragstart="dg=${k}" class="btn ${pk===k?'':'alt'}" onclick="pk=${k};rS()">${w}</button>`).join('')+'</div>'}
+h+=`<button class="btn mt-4 w-full" onclick="sub()">${si==9?'JAWAB & SELESAI':'JAWAB ▶'}</button></div>`;$('sq').innerHTML=h}
+function plc(k,w){if(w===null||w===undefined)return;fl[k]=SQ[si].w[w];dg=pk=null;rS()}
+function sl(k){if(fl[k]){fl[k]=null;rS()}else plc(k,pk)}
+function sub(){const q=SQ[si];let ok=false;
+if(q.t=='mc'){if(sel===null)return toast('Pilih jawaban dulu',0);ok=sel===q.a}
+if(q.t=='mark'){if(sel===null)return toast('Tandai satu kata dulu',0);ok=cl(q.s.split(' ')[sel])===q.a}
+if(q.t=='drag'){if(fl.includes(null))return toast('Isi semua kotak dulu',0);ok=fl.every((x,k)=>x===q.b[k])}
+if(ok){ss++;sOk();toast('Benar! 🎉',1)}else{sBad();toast('Belum tepat',0)}
+si++;if(si==10)return fin();qReset();rS()}
+function fin(){const r={nama:nm(),nilai:ss*10,benar:ss,waktu:new Date().toLocaleString('id-ID')};save(r);$('cn').textContent=r.nama;$('cs').textContent=r.nilai;$('cd').textContent=r.waktu;$('cm').textContent=r.nilai>=80?'Sangat baik! Pertahankan semangat belajarmu.':r.nilai>=60?'Baik! Terus berlatih ya.':'Tetap semangat, ayo pelajari materi lagi!';sWin();$('sintro').classList.remove('hidden');$('sq').classList.add('hidden');go('cert')}
+function save(r){try{const a=JSON.parse(localStorage.getItem('mpi_nilai')||'[]');a.push(r);localStorage.setItem('mpi_nilai',JSON.stringify(a))}catch(e){}if(SHEET_URL)fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(r)}).catch(()=>{})}
+function dl(){let a=[];try{a=JSON.parse(localStorage.getItem('mpi_nilai')||'[]')}catch(e){}const c='Nama,Nilai,Benar,Waktu\n'+a.map(r=>`"${r.nama}",${r.nilai},${r.benar},"${r.waktu}"`).join('\n');const l=document.createElement('a');l.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));l.download='nilai_golongan_darah.csv';l.click()}
+
+/* ===== KUIS: 4 GAME x 3 LEVEL ===== */
+const TF=['Benar','Salah'];
+const GM={
+1:{n:'Kuis Kilat',ic:'⚡',d:'Pilihan ganda seputar golongan darah.',lv:[
+ [['Antigen golongan darah terdapat pada...',['Eritrosit','Plasma','Trombosit'],0],['Berapa golongan darah dalam sistem ABO?',['2','4','6'],1],['Penggumpalan darah akibat antigen-antibodi disebut...',['Aglutinasi','Pembekuan','Fagositosis'],0]],
+ [['Golongan darah dengan antibodi anti-A dan anti-B adalah...',['A','AB','O'],2],['Penemu sistem ABO adalah...',['Karl Landsteiner','Louis Pasteur','Robert Hooke'],0],['Golongan darah tanpa antibodi adalah...',['AB','O','B'],0]],
+ [['Golongan B dapat menerima darah dari...',['A dan AB','B dan O','AB dan O'],1],['Resipien universal adalah golongan...',['O','AB','A'],1],['Darah golongan A dapat didonorkan kepada...',['A dan AB','A dan O','Semua golongan'],0]]]},
+2:{n:'Benar atau Salah',ic:'✅',d:'Nilai pernyataan: benar atau salah?',lv:[
+ [['Golongan darah O tidak memiliki antigen A maupun B.',TF,0],['Antibodi terdapat pada eritrosit.',TF,1],['Golongan darah A memiliki antigen A.',TF,0]],
+ [['Golongan AB memiliki antibodi anti-A dan anti-B.',TF,1],['Golongan O adalah donor universal.',TF,0],['Aglutinasi terjadi saat antigen bertemu antibodi yang sesuai.',TF,0]],
+ [['Golongan A dapat menerima darah dari golongan B.',TF,1],['Golongan AB dapat mendonorkan darah kepada golongan A.',TF,1],['Golongan B dapat menerima darah dari golongan O.',TF,0]]]},
+3:{n:'Detektif Aglutinasi',ic:'🔍',d:'Tentukan golongan darah dari hasil praktikum.',lv:[
+ [['Anti-A menggumpal, anti-B tidak. Golongan darahnya?',['A','B','O'],0],['Anti-B menggumpal, anti-A tidak. Golongan darahnya?',['AB','B','O'],1],['Tidak ada serum yang menggumpal. Golongan darahnya?',['O','AB','A'],0]],
+ [['Anti-A dan anti-B sama-sama menggumpal. Golongan darahnya?',['AB','O','A'],0],['Sampel menggumpal dengan anti-B saja. Antigen apa yang dimilikinya?',['Antigen A','Antigen B','Tidak ada'],1],['Sampel tidak menggumpal sama sekali. Antibodi apa di plasmanya?',['Tidak ada','Anti-A dan anti-B','Anti-A saja'],1]],
+ [['Pasien golongan A membutuhkan darah. Donor yang aman?',['B','AB','O'],2],['Pasien golongan O membutuhkan darah. Donor yang aman?',['O','A','B'],0],['Mengapa pasien B tidak boleh menerima darah A?',['Anti-A pasien menggumpalkan antigen A','Pasien tidak punya eritrosit','Darah A terlalu encer'],0]]]},
+4:{n:'Memori Kartu',ic:'🃏',d:'Cocokkan golongan darah dengan pasangannya.',lv:[1,2,3]}
+};
+$('gmenu').innerHTML=Object.keys(GM).map(k=>`<div class="card"><p class="text-3xl">${GM[k].ic}</p><p class="font-extrabold text-lg text-blue-800">${GM[k].n}</p><p class="mb-3">${GM[k].d}</p><button class="btn w-full" onclick="gStart(${k})">MAIN</button></div>`).join('');
+let GI=0,L=0,Q=[],qi=0,sc=0,lock=false,mem;
+function gStart(g){GI=g;L=0;lvGo()}
+function lvGo(){go('game');if(GI==4)return memGo();Q=GM[GI].lv[L];qi=0;sc=0;lock=false;gq()}
+function gq(){const q=Q[qi];$('gbox').innerHTML=`<div class="flex justify-between font-bold mb-2"><span>${GM[GI].ic} ${GM[GI].n}</span><span>Level ${L+1}/3 · Soal ${qi+1}/3</span></div><div class="card font-semibold text-lg mb-3">${q[0]}</div>`+q[1].map((o,i)=>`<button class="btn alt block w-full mb-2 text-left" onclick="ga(${i})">${o}</button>`).join('')}
+function ga(i){if(lock)return;lock=true;const q=Q[qi],ok=i==q[2];if(ok){sc++;sOk()}else sBad();toast(ok?'Benar! 🎉':'Jawaban: '+q[1][q[2]],ok);setTimeout(()=>{qi++;lock=false;qi<3?gq():lvEnd(sc>=2,sc+' dari 3 benar')},1300)}
+function lvEnd(p,info){const last=L==2;if(p)sWin();$('gbox').innerHTML=`<div class="card text-center"><div class="text-6xl">${p?'⭐':'💪'}</div><h2 class="text-2xl font-extrabold my-2">${p?(last?'Semua level selesai! 🏆':'Level '+(L+1)+' lulus!'):'Coba lagi ya!'}</h2><p class="mb-4">Hasil: ${info}${p?'':' (butuh minimal 2 benar)'}</p>`+(p&&!last?`<button class="btn" onclick="L++;lvGo()">Lanjut Level ${L+2} ▶</button>`:p?`<button class="btn" onclick="go('kuis')">Kembali ke menu kuis</button>`:`<button class="btn" onclick="lvGo()">Ulangi level</button>`)+'</div>'}
+const PR=[['Gol. A','Antigen A'],['Gol. B','Antigen B'],['Gol. AB','Antigen A & B'],['Gol. O','Tanpa antigen'],['Donor universal','O'],['Resipien universal','AB']];
+function memGo(){const n=[3,4,6][L],c=[];PR.slice(0,n).forEach((p,i)=>{c.push({t:p[0],k:i});c.push({t:p[1],k:i})});c.sort(()=>Math.random()-.5);mem={c,o:[],m:[],mv:0,lk:false};md()}
+function md(){$('gbox').innerHTML=`<div class="flex justify-between font-bold mb-2"><span>🃏 Memori Kartu</span><span>Level ${L+1}/3 · Langkah ${mem.mv}</span></div><p class="mb-2">Ketuk dua kartu untuk mencari pasangan yang cocok.</p><div class="grid grid-cols-3 gap-2">`+mem.c.map((x,i)=>{const mt=mem.m.includes(i),sh=mt||mem.o.includes(i);return `<button class="btn ${mt?'':'alt'} h-20 text-sm" onclick="mf(${i})">${sh?x.t:'❓'}</button>`}).join('')+'</div>'}
+function mf(i){if(mem.lk||mem.o.includes(i)||mem.m.includes(i))return;mem.o.push(i);if(mem.o.length==2){mem.mv++;const[a,b]=mem.o;if(mem.c[a].k==mem.c[b].k){mem.m.push(a,b);mem.o=[];sOk();md();if(mem.m.length==mem.c.length)setTimeout(()=>lvEnd(true,mem.mv+' langkah'),700);return}mem.lk=true;md();sBad();setTimeout(()=>{mem.o=[];mem.lk=false;md()},900);return}md()}
+
+mat(0);
+</script>
+</body></html>
